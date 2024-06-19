@@ -1,0 +1,25 @@
+{
+  "[*]": {
+    "editor.tabSize": 4
+  },
+  "[json]": {
+    "editor.tabSize": 2
+  },
+  "editor.formatOnSave": true,
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true
+  },
+  "python.analysis.extraPaths": [
+    ".venv/lib/python3.10/site-packages"
+  ],
+  "python.defaultInterpreterPath": ".venv/bin/python",
+  "python.analysis.stubPath": "stubs",
+  "flake8.path": [
+    ".venv/bin/pflake8"
+  ],
+  "python.formatting.provider": "none",
+}
