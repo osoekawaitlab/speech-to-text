@@ -42,9 +42,12 @@ class BaseSpeechToTextModelSettings(BaseSettings):
     type: SpeechToTextModelType
 
 
+WhisperSpeechToTextModelPathOrModelSize = WhisperSpeechToTextModelSize | DirectoryPath
+
+
 class WhisperSpeechToTextModelSettings(BaseSpeechToTextModelSettings):
     type: Literal[SpeechToTextModelType.WHISPER] = SpeechToTextModelType.WHISPER
-    path_or_model_size: WhisperSpeechToTextModelSize | DirectoryPath
+    path_or_model_size: WhisperSpeechToTextModelPathOrModelSize
     language: WhisperSpeechToTextModelLanguage
 
 
