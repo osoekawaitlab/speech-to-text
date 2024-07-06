@@ -26,8 +26,10 @@ class Segment(NamedTuple):
     avg_logprob: float
     compression_ratio: float
     no_speech_prob: float
-    words: Optional[List[Word]]
+    words: List[Word]
 
 class WhisperModel:
     def __init__(self, model_size_or_path: str) -> None: ...
-    def transcribe(self, stream: BufferedReader) -> Tuple[List[Segment], TranscriptionInfo]: ...
+    def transcribe(
+        self, stream: BufferedReader, language: str, word_timestamps: bool
+    ) -> Tuple[List[Segment], TranscriptionInfo]: ...
