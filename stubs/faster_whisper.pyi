@@ -1,5 +1,5 @@
 from io import BufferedReader
-from typing import Any, Iterable, List, NamedTuple, Optional, Tuple, Union
+from typing import List, NamedTuple, Optional, Tuple
 
 class TranscriptionInfo(NamedTuple):
     language: str
