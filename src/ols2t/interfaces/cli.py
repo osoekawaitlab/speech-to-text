@@ -16,9 +16,10 @@ def main() -> None:
     if args.subcommand == "transcribe":
         settings = SpeechToTextCoreSettings()
         core = SpeechToTextCore.create(settings=settings)
-        with FileStream(path=args.audio_file) as s, open(args.output_file, "w", encoding="utf-8") as fout:
-            for s in core.transcribe(input_stream=s):
-                fout.write(s.model_dump_json())
+        stream = FileStream(path=args.audio_file)
+        with open(args.output_file, "w", encoding="utf-8") as fout:
+            for segment in core.transcribe(input_stream=stream):
+                fout.write(segment.model_dump_json())
                 fout.write("\n")
     else:
         parser.print_help()
