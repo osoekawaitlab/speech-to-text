@@ -1,5 +1,9 @@
+import pytest
+from ctranslate2 import get_cuda_device_count
+
 from ols2t.models import FileStream, Segment
 from ols2t.settings import (
+    WhisperSpeechToTextModelDevice,
     WhisperSpeechToTextModelLanguage,
     WhisperSpeechToTextModelSize,
 )
@@ -20,3 +24,16 @@ def test_whisper_speech_to_text_model_transcribe(hello_fixture: FileStream) -> N
         assert a.text == e.text
         cnt += 1
     assert cnt == 1
+
+
+def test_whisper_speech_to_text_model_accepts_device_argument() -> None:
+    model = WhisperSpeechToTextModel(
+        path_or_model_size=WhisperSpeechToTextModelSize.SMALL,
+        language=WhisperSpeechToTextModelLanguage.JA,
+        device=WhisperSpeechToTextModelDevice.CUDA,
+    )
+    if get_cuda_device_count() > 0:
+        assert model.model_cache.model.device == "cuda"
+    else:
+        with pytest.raises(RuntimeError):
+            model.model_cache

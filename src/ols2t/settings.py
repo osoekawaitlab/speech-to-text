@@ -38,6 +38,11 @@ class WhisperSpeechToTextModelLanguage(str, Enum):
     JA = "ja"
 
 
+class WhisperSpeechToTextModelDevice(str, Enum):
+    CPU = "cpu"
+    CUDA = "cuda"
+
+
 class BaseSpeechToTextModelSettings(BaseSettings):
     type: SpeechToTextModelType
 

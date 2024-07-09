@@ -1,0 +1,3 @@
+class Whisper:
+    @property
+    def device(self) -> str: ...

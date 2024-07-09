@@ -1,6 +1,8 @@
 from io import BufferedReader
 from typing import List, NamedTuple, Optional, Tuple
 
+from ctranslate2.models import Whisper
+
 class TranscriptionInfo(NamedTuple):
     language: str
     language_probability: float
@@ -29,7 +31,9 @@ class Segment(NamedTuple):
     words: List[Word]
 
 class WhisperModel:
-    def __init__(self, model_size_or_path: str) -> None: ...
+    def __init__(self, model_size_or_path: str, device: str) -> None: ...
     def transcribe(
         self, stream: BufferedReader, language: str, word_timestamps: bool
     ) -> Tuple[List[Segment], TranscriptionInfo]: ...
+    @property
+    def model(self) -> Whisper: ...
