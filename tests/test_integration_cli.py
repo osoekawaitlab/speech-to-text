@@ -21,3 +21,10 @@ def test_cli_run_transcribe(fixture_dir: str, patch_whisper_small_environment_va
             data = [json.loads(line) for line in output_file]
         assert len(data) == 1
         assert data[0]["text"] == "こんにちは"
+
+
+def test_cli_has_version() -> None:
+    from ols2t import __version__
+
+    version = subprocess.run(["ols2t", "--version"], stdout=subprocess.PIPE, check=True)
+    assert version.stdout.decode().strip() == __version__
