@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 
+from .. import __version__
 from ..core import SpeechToTextCore
 from ..models import FileStream
 from ..settings import SpeechToTextCoreSettings
@@ -7,6 +8,7 @@ from ..settings import SpeechToTextCoreSettings
 
 def main() -> None:
     parser = ArgumentParser()
+    parser.add_argument("--version", action="version", version=__version__)
     subcommand_parser = parser.add_subparsers(dest="subcommand")
     transcribe_parser = subcommand_parser.add_parser("transcribe")
     transcribe_parser.add_argument("audio_file")
