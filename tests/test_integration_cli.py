@@ -28,3 +28,24 @@ def test_cli_has_version() -> None:
 
     version = subprocess.run(["ols2t", "--version"], stdout=subprocess.PIPE, check=True)
     assert version.stdout.decode().strip() == __version__
+
+
+def test_cli_transcribe_with_settings_option(fixture_dir: str) -> None:
+    with tempfile.TemporaryDirectory() as tempdir:
+        output_file_name = "output.jsonl"
+        error_code = subprocess.run(
+            [
+                "ols2t",
+                "--settings",
+                os.path.join(fixture_dir, "tiny_ja_settings.json"),
+                "transcribe",
+                os.path.join(fixture_dir, "hello_ja.wav"),
+                os.path.join(tempdir, output_file_name),
+            ],
+            env=os.environ,
+        )
+        assert error_code.returncode == 0
+        with open(os.path.join(tempdir, output_file_name), "r") as output_file:
+            data = [json.loads(line) for line in output_file]
+        assert len(data) == 4
+        assert "".join(s["text"] for s in data) == "おにちわ"
