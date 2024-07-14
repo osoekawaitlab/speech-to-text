@@ -1,0 +1,4 @@
+speech_to_text_model_settings:
+  type: WHISPER
+  path_or_model_size: tiny
+  language: ja
