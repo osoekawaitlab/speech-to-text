@@ -61,3 +61,23 @@ SpeechToTextModelSettings = Annotated[WhisperSpeechToTextModelSettings, Field(di
 
 class SpeechToTextCoreSettings(BaseSettings):
     speech_to_text_model_settings: SpeechToTextModelSettings
+
+
+class InterfaceType(str, Enum):
+    CLI = "CLI"
+
+
+class BaseInterfaceSettings(BaseSettings):
+    type: InterfaceType
+
+
+class CliInterfaceSettings(BaseInterfaceSettings):
+    type: Literal[InterfaceType.CLI] = InterfaceType.CLI
+
+
+InterfaceSettings = Annotated[CliInterfaceSettings, Field(discriminator="type")]
+
+
+class SpeechToTextAppSettings(BaseSettings):
+    core_settings: SpeechToTextCoreSettings
+    interface_settings: InterfaceSettings
