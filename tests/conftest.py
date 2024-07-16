@@ -2,6 +2,7 @@ import os
 from collections.abc import Generator
 
 import pytest
+from pytest import Config
 from pytest_mock import MockerFixture
 
 from ols2t.models import FileStream
@@ -43,3 +44,7 @@ def patch_whisper_small_environment_variable(
         ),
     )
     yield
+
+
+def pytest_configure(config: Config) -> None:
+    config.addinivalue_line("markers", "slow: marks tests as slow")

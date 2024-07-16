@@ -71,6 +71,9 @@ testpaths = ["tests", "ols2t"]
 filterwarnings = [
     "error",
 ]
+markers = [
+    "slow: marks tests as slow"
+]
 
 [tool.black]
 line-length = 120
@@ -101,6 +104,19 @@ skipsdist = true
 envlist = py310
 
 [testenv]
+setenv =
+    VIRTUALENV_PIP = 24.1
+deps =
+    -e .[dev]
+commands =
+    black src/ tests
+    isort src/ tests
+    pytest -v -m "not slow"
+    pflake8 src/ tests/ stubs/
+    mypy src/ols2t --strict --show-traceback
+    mypy tests --strict
+
+[testenv:fulltest]
 setenv =
     VIRTUALENV_PIP = 24.1
 deps =

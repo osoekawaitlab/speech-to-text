@@ -10,6 +10,7 @@ from ols2t.settings import (
 from ols2t.speech_to_text_models.whisper import WhisperSpeechToTextModel
 
 
+@pytest.mark.slow
 def test_whisper_speech_to_text_model_transcribe(hello_fixture: FileStream) -> None:
     model = WhisperSpeechToTextModel(
         path_or_model_size=WhisperSpeechToTextModelSize.SMALL, language=WhisperSpeechToTextModelLanguage.JA

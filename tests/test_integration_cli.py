@@ -3,7 +3,10 @@ import os
 import subprocess
 import tempfile
 
+import pytest
 
+
+@pytest.mark.slow
 def test_cli_run_transcribe(fixture_dir: str, patch_whisper_small_environment_variable: None) -> None:
     with tempfile.TemporaryDirectory() as tempdir:
         output_file_name = "output.jsonl"
@@ -30,6 +33,7 @@ def test_cli_has_version() -> None:
     assert version.stdout.decode().strip() == __version__
 
 
+@pytest.mark.slow
 def test_cli_transcribe_with_settings_option_json(fixture_dir: str) -> None:
     with tempfile.TemporaryDirectory() as tempdir:
         output_file_name = "output.jsonl"
@@ -51,6 +55,7 @@ def test_cli_transcribe_with_settings_option_json(fixture_dir: str) -> None:
         assert "".join(s["text"] for s in data) == "おにちわ"
 
 
+@pytest.mark.slow
 def test_cli_transcribe_with_settings_option_yaml(fixture_dir: str) -> None:
     with tempfile.TemporaryDirectory() as tempdir:
         output_file_name = "output.jsonl"
