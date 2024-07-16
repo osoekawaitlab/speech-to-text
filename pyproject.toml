@@ -39,7 +39,7 @@ packages=["ols2t"]
 ols2t = ["py.typed"]
 
 [project.scripts]
-ols2t = "ols2t.interfaces.cli:main"
+ols2t = "ols2t.main:main"
 
 [project.optional-dependencies]
 dev=[

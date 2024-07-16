@@ -38,11 +38,19 @@ def patch_whisper_small_environment_variable(
         "os.environ",
         dict(
             os.environ,
-            OLS2T_SPEECH_TO_TEXT_MODEL_SETTINGS__TYPE="WHISPER",
-            OLS2T_SPEECH_TO_TEXT_MODEL_SETTINGS__PATH_OR_MODEL_SIZE="small",
-            OLS2T_SPEECH_TO_TEXT_MODEL_SETTINGS__LANGUAGE="ja",
+            OLS2T_CORE_SETTINGS__SPEECH_TO_TEXT_MODEL_SETTINGS__TYPE="WHISPER",
+            OLS2T_CORE_SETTINGS__SPEECH_TO_TEXT_MODEL_SETTINGS__PATH_OR_MODEL_SIZE="small",
+            OLS2T_CORE_SETTINGS__SPEECH_TO_TEXT_MODEL_SETTINGS__LANGUAGE="ja",
         ),
     )
+    yield
+
+
+@pytest.fixture
+def patch_cli_environment_variable(
+    patch_empty_environment_variables: None, mocker: MockerFixture
+) -> Generator[None, None, None]:
+    mocker.patch("os.environ", dict(os.environ, OLS2T_INTERFACE_SETTINGS__TYPE="CLI"))
     yield
 
 

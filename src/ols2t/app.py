@@ -1,3 +1,5 @@
+from argparse import ArgumentParser
+
 from .core import SpeechToTextCore
 from .interfaces.base import BaseInterface
 from .interfaces.factory import create_interface
@@ -21,7 +23,9 @@ class SpeechToTextApp:
         self.interface.run()
 
     @classmethod
-    def create(cls, settings: SpeechToTextAppSettings) -> "SpeechToTextApp":
+    def create(cls, settings: SpeechToTextAppSettings, basic_argument_parser: ArgumentParser) -> "SpeechToTextApp":
         core = SpeechToTextCore.create(settings=settings.core_settings)
-        interface = create_interface(settings=settings.interface_settings, core=core)
+        interface = create_interface(
+            settings=settings.interface_settings, core=core, basic_argument_parser=basic_argument_parser
+        )
         return cls(core=core, interface=interface)

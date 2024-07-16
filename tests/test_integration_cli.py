@@ -7,7 +7,9 @@ import pytest
 
 
 @pytest.mark.slow
-def test_cli_run_transcribe(fixture_dir: str, patch_whisper_small_environment_variable: None) -> None:
+def test_cli_run_transcribe(
+    fixture_dir: str, patch_whisper_small_environment_variable: None, patch_cli_environment_variable: None
+) -> None:
     with tempfile.TemporaryDirectory() as tempdir:
         output_file_name = "output.jsonl"
         error_code = subprocess.run(

@@ -1,7 +1,12 @@
 {
-  "speech_to_text_model_settings": {
-    "type": "WHISPER",
-    "path_or_model_size": "tiny",
-    "language": "ja"
+  "core_settings": {
+    "speech_to_text_model_settings": {
+      "type": "WHISPER",
+      "path_or_model_size": "tiny",
+      "language": "ja"
+    }
+  },
+  "interface_settings": {
+    "type": "CLI"
   }
 }
