@@ -5,9 +5,9 @@ from ..models import FileStream
 from .base import BaseInterface
 
 
-class CliInterface(BaseInterface):
+class Cli(BaseInterface):
     def __init__(self, core: SpeechToTextCore, basic_argument_parser: ArgumentParser) -> None:
-        super(CliInterface, self).__init__(core=core)
+        super(Cli, self).__init__(core=core)
         self._parser = basic_argument_parser
         subcommand_parser = self._parser.add_subparsers(dest="subcommand")
         transcribe_parser = subcommand_parser.add_parser("transcribe")
