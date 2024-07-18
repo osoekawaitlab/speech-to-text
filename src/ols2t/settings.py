@@ -71,11 +71,11 @@ class BaseInterfaceSettings(BaseSettings):
     type: InterfaceType
 
 
-class CliInterfaceSettings(BaseInterfaceSettings):
+class CliSettings(BaseInterfaceSettings):
     type: Literal[InterfaceType.CLI] = InterfaceType.CLI
 
 
-InterfaceSettings = Annotated[CliInterfaceSettings, Field(discriminator="type")]
+InterfaceSettings = Annotated[CliSettings, Field(discriminator="type")]
 
 
 class SpeechToTextAppSettings(BaseSettings):
