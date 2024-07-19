@@ -2,10 +2,14 @@ from contextlib import AbstractContextManager
 from enum import Enum
 from io import BufferedReader
 from types import TracebackType
-from typing import Literal, Type
+from typing import Literal, Type, TypeAlias
 
+import numpy as np
+from numpy.typing import NDArray
 from oltl import BaseModel
 from pydantic import FilePath
+
+FRAME_ARRAY_T: TypeAlias = NDArray[np.float32]
 
 
 class AbstractTranscriber: ...

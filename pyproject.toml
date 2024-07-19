@@ -27,6 +27,7 @@ classifiers = [
 dependencies = [
     "oltl @ git+https://github.com/osoekawaitlab/ol-type-library",
     "faster-whisper",
+    "numpy",
 ]
 
 [project.urls]
