@@ -1,16 +1,18 @@
+from collections.abc import Iterable
 from contextlib import AbstractContextManager
 from enum import Enum
-from io import BufferedReader
 from types import TracebackType
 from typing import Literal, Type, TypeAlias
 
 import numpy as np
+from faster_whisper.audio import decode_audio
 from numpy.typing import NDArray
 from oltl import BaseModel
 from pydantic import FilePath
 
 AudioSample: TypeAlias = np.float32
 AudioFrameChunk: TypeAlias = NDArray[AudioSample]
+AudioChunkStream: TypeAlias = Iterable[AudioFrameChunk]
 
 
 class AbstractTranscriber: ...
@@ -20,7 +22,7 @@ class StreamType(str, Enum):
     FILE = "FILE"
 
 
-class BaseStream(BaseModel, AbstractContextManager[BufferedReader]):
+class BaseStream(BaseModel, AbstractContextManager[AudioChunkStream]):
     type: StreamType
 
 
@@ -28,9 +30,9 @@ class FileStream(BaseStream):
     type: Literal[StreamType.FILE] = StreamType.FILE
     path: FilePath
 
-    def __enter__(self) -> BufferedReader:
+    def __enter__(self) -> AudioChunkStream:
         self._fp = open(self.path, "rb")
-        return self._fp
+        yield decode_audio(self._fp)
 
     def __exit__(
         self, exc_type: Type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None
