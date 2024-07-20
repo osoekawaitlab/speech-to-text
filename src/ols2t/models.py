@@ -9,7 +9,8 @@ from numpy.typing import NDArray
 from oltl import BaseModel
 from pydantic import FilePath
 
-FRAME_ARRAY_T: TypeAlias = NDArray[np.float32]
+AudioSample: TypeAlias = np.float32
+AudioFrameChunk: TypeAlias = NDArray[AudioSample]
 
 
 class AbstractTranscriber: ...
