@@ -12,7 +12,69 @@ from pydantic import FilePath
 
 AudioSample: TypeAlias = np.float32
 AudioFrameChunk: TypeAlias = NDArray[AudioSample]
-AudioChunkStream: TypeAlias = Iterable[AudioFrameChunk]
+
+
+SamplingRate: TypeAlias = int
+
+
+class AudioChunkStream(Iterable[AudioFrameChunk]):
+    """
+    A stream of audio chunks.
+
+    Attributes:
+        sampling_rate (SamplingRate): The sampling rate of the audio.
+        data (Iterable[AudioFrameChunk]): The audio data.
+
+    >>> x = AudioChunkStream(sampling_rate=2, data=iter([np.array([1.0, 2.0, 3.0]), np.array([4.0, 5.0, 6.0])]))
+    >>> x.sampling_rate
+    2
+    >>> x.current_frame
+    0
+    >>> x.offset
+    0.0
+    >>> next(x)
+    array([1., 2., 3.])
+    >>> x.current_frame
+    3
+    >>> x.offset
+    1.5
+    >>> next(x)
+    array([4., 5., 6.])
+    >>> x.current_frame
+    6
+    >>> x.offset
+    3.0
+    >>> next(x)
+    Traceback (most recent call last):
+     ...
+    StopIteration
+    """
+
+    def __init__(self, sampling_rate: SamplingRate, data: Iterable[AudioFrameChunk]) -> None:
+        self._data = iter(data)
+        self._sampling_rate = sampling_rate
+        self._current_frame = 0
+
+    @property
+    def sampling_rate(self) -> SamplingRate:
+        return self._sampling_rate
+
+    @property
+    def offset(self) -> float:
+        return self.current_frame / self.sampling_rate
+
+    @property
+    def current_frame(self) -> int:
+        return self._current_frame
+
+    def __next__(self) -> AudioFrameChunk:
+        for d in self._data:
+            self._current_frame += len(d)
+            return d
+        raise StopIteration
+
+    def __iter__(self) -> "AudioChunkStream":
+        return self
 
 
 class AbstractTranscriber: ...
@@ -32,7 +94,8 @@ class FileStream(BaseStream):
 
     def __enter__(self) -> AudioChunkStream:
         self._fp = open(self.path, "rb")
-        yield decode_audio(self._fp)
+        sampling_rate = 16000
+        return AudioChunkStream(sampling_rate, iter((decode_audio(self._fp, sampling_rate=sampling_rate),)))
 
     def __exit__(
         self, exc_type: Type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None
