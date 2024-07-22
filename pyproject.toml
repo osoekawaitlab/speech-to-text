@@ -71,7 +71,7 @@ docs=[
 
 [tool.pytest.ini_options]
 addopts = ["-sv", "--random-order", "--doctest-modules", "--cov=ols2t", "--cov-report=xml", "--cov-report=term-missing"]
-testpaths = ["tests", "ols2t"]
+testpaths = ["tests", "src/ols2t"]
 filterwarnings = [
     "error",
 ]
@@ -115,7 +115,7 @@ deps =
 commands =
     black src/ tests
     isort src/ tests
-    pytest -v -m "not slow"
+    pytest -m "not slow"
     pflake8 src/ tests/ stubs/
     mypy src/ols2t --strict --show-traceback
     mypy tests --strict
