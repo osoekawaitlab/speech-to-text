@@ -28,6 +28,7 @@ dependencies = [
     "oltl @ git+https://github.com/osoekawaitlab/ol-type-library",
     "faster-whisper",
     "numpy",
+    "pyaudio",
 ]
 
 [project.urls]
@@ -62,9 +63,6 @@ dev=[
     "uvicorn",
 ]
 prod=[
-]
-native_device_interface=[
-    "pyaudio",
 ]
 docs=[
 ]
