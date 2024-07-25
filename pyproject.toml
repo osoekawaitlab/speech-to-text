@@ -56,6 +56,7 @@ dev=[
     "pytest-cov",
     "freezegun",
     "types-python-dateutil",
+    "types-pyaudio",
     "factory_boy",
     "polyfactory",
     "httpx",

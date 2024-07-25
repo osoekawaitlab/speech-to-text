@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 from contextlib import AbstractContextManager
 from enum import Enum
+from itertools import count
 from types import TracebackType
 from typing import Literal, Type, TypeAlias
 
@@ -8,6 +9,7 @@ import numpy as np
 from faster_whisper.audio import decode_audio
 from numpy.typing import NDArray
 from oltl import BaseModel
+from pyaudio import PyAudio, paFloat32
 from pydantic import FilePath
 
 AudioSample: TypeAlias = np.float32
@@ -54,6 +56,10 @@ class AudioChunkStream(Iterable[AudioFrameChunk]):
         self._data = iter(data)
         self._sampling_rate = sampling_rate
         self._current_frame = 0
+        self._stop = False
+
+    def stop(self) -> None:
+        self._stop = True
 
     @property
     def sampling_rate(self) -> SamplingRate:
@@ -68,6 +74,8 @@ class AudioChunkStream(Iterable[AudioFrameChunk]):
         return self._current_frame
 
     def __next__(self) -> AudioFrameChunk:
+        if self._stop:
+            raise StopIteration
         for d in self._data:
             self._current_frame += len(d)
             return d
@@ -82,6 +90,7 @@ class AbstractTranscriber: ...
 
 class StreamType(str, Enum):
     FILE = "FILE"
+    MICROPHONE = "MICROPHONE"
 
 
 class BaseStream(BaseModel, AbstractContextManager[AudioChunkStream]):
@@ -101,6 +110,23 @@ class FileStream(BaseStream):
         self, exc_type: Type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None
     ) -> bool | None:
         self._fp.close()
+        return super().__exit__(exc_type, exc_value, traceback)
+
+
+class MicrophoneStream(BaseStream):
+    type: Literal[StreamType.MICROPHONE] = StreamType.MICROPHONE
+
+    def __enter__(self) -> AudioChunkStream:
+        sampling_rate = 16000
+        self._audio = PyAudio()
+        self._stream = self._audio.open(
+            format=paFloat32, channels=1, rate=sampling_rate, input=True, frames_per_buffer=1024
+        )
+        return AudioChunkStream(sampling_rate, (np.frombuffer(self._stream.read(16000), np.float32) for _ in count()))
+
+    def __exit__(
+        self, exc_type: Type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None
+    ) -> bool | None:
         return super().__exit__(exc_type, exc_value, traceback)
 
 

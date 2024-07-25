@@ -1,6 +1,7 @@
 import os
-from collections.abc import Generator
+from collections.abc import Generator, Iterable
 
+import numpy as np
 import pytest
 from pytest import Config
 from pytest_mock import MockerFixture
@@ -28,6 +29,20 @@ def patch_empty_environment_variables(mocker: MockerFixture) -> Generator[None, 
     current_environment_variables = os.environ.copy()
     mocker.patch("os.environ", {k: v for k, v in current_environment_variables.items() if not k.startswith("OLS2T_")})
     yield
+
+
+@pytest.fixture
+def longtext_all_decoded_fixture_path(fixture_dir: str) -> Generator[str, None, None]:
+    yield os.path.join(fixture_dir, "longtext_all_decoded.npy")
+
+
+@pytest.fixture
+def longtext_all_decoded_one_second_chunks(
+    longtext_all_decoded_fixture_path: str,
+) -> Generator[Iterable[bytes], None, None]:
+    with open(longtext_all_decoded_fixture_path, "rb") as f:
+        x = np.load(f)
+        yield (x[i : i + 16000].tobytes() for i in range(0, len(x), 16000))
 
 
 @pytest.fixture
