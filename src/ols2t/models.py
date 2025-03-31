@@ -7,14 +7,11 @@ from typing import Literal, Type, TypeAlias
 
 import numpy as np
 from faster_whisper.audio import decode_audio
-from numpy.typing import NDArray
 from oltl import BaseModel
 from pyaudio import PyAudio, paFloat32
 from pydantic import FilePath
 
-AudioSample: TypeAlias = np.float32
-AudioFrameChunk: TypeAlias = NDArray[AudioSample]
-
+from .types import AudioFrameChunk
 
 SamplingRate: TypeAlias = int
 
@@ -91,10 +88,25 @@ class AbstractTranscriber: ...
 class StreamType(str, Enum):
     FILE = "FILE"
     MICROPHONE = "MICROPHONE"
+    AUDIO_FRAME = "AUDIO_FRAME"
 
 
 class BaseStream(BaseModel, AbstractContextManager[AudioChunkStream]):
     type: StreamType
+
+
+class AudioFrameStream(BaseStream):
+    type: Literal[StreamType.AUDIO_FRAME] = StreamType.AUDIO_FRAME
+    chunks: Iterable[AudioFrameChunk]
+    sampling_rate: SamplingRate
+
+    def __enter__(self) -> AudioChunkStream:
+        return AudioChunkStream(sampling_rate=self.sampling_rate, data=np.concatenate(list(self.chunks)))
+
+    def __exit__(
+        self, exc_type: Type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None
+    ) -> bool | None:
+        return super().__exit__(exc_type, exc_value, traceback)
 
 
 class FileStream(BaseStream):
@@ -104,7 +116,9 @@ class FileStream(BaseStream):
     def __enter__(self) -> AudioChunkStream:
         self._fp = open(self.path, "rb")
         sampling_rate = 16000
-        return AudioChunkStream(sampling_rate, iter((decode_audio(self._fp, sampling_rate=sampling_rate),)))
+        return AudioChunkStream(
+            sampling_rate, iter((AudioFrameChunk(decode_audio(self._fp, sampling_rate=sampling_rate)),))
+        )
 
     def __exit__(
         self, exc_type: Type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None
@@ -122,7 +136,7 @@ class MicrophoneStream(BaseStream):
         self._stream = self._audio.open(
             format=paFloat32, channels=1, rate=sampling_rate, input=True, frames_per_buffer=1024
         )
-        return AudioChunkStream(sampling_rate, (np.frombuffer(self._stream.read(16000), np.float32) for _ in count()))
+        return AudioChunkStream(sampling_rate, (AudioFrameChunk(self._stream.read(16000)) for _ in count()))
 
     def __exit__(
         self, exc_type: Type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None

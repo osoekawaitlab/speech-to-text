@@ -69,7 +69,7 @@ docs=[
 ]
 
 [tool.pytest.ini_options]
-addopts = ["-sv", "--random-order", "--doctest-modules", "--cov=ols2t", "--cov-report=xml", "--cov-report=term-missing"]
+addopts = ["-svvv", "--random-order", "--doctest-modules", "--cov=ols2t", "--cov-report=xml", "--cov-report=term-missing"]
 testpaths = ["tests", "src/ols2t"]
 filterwarnings = [
     "error",
