@@ -12,6 +12,6 @@ def create_speech_to_text_model(settings: SpeechToTextModelSettings) -> BaseSpee
     if isinstance(settings, WhisperSpeechToTextModelSettings):
         return WhisperSpeechToTextModel(path_or_model_size=settings.path_or_model_size, language=settings.language)
     elif isinstance(settings, SegmentMergingSpeechToTextModelSettings):
-        model = create_speech_to_text_model(settings=settings.model_settings)
+        model = create_speech_to_text_model(settings=settings.speech_to_text_model_settings)
         return SegmentMergingSpeechToTextModel(model=model)
     raise ValueError(f"Unknown model type: {settings.type}")

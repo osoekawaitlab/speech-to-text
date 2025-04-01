@@ -36,7 +36,7 @@ def test_factory_generates_segment_merging_speech_to_text_model(mocker: MockerFi
         "ols2t.speech_to_text_models.factory.SegmentMergingSpeechToTextModel"
     )
     settings = SegmentMergingSpeechToTextModelSettings(
-        model_settings=WhisperSpeechToTextModelSettings(
+        speech_to_text_model_settings=WhisperSpeechToTextModelSettings(
             path_or_model_size=WhisperSpeechToTextModelSize.TINY,
             language=WhisperSpeechToTextModelLanguage.JA,
         )

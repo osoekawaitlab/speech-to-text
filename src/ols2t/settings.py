@@ -59,7 +59,7 @@ class WhisperSpeechToTextModelSettings(BaseSpeechToTextModelSettings):
 
 class SegmentMergingSpeechToTextModelSettings(BaseSpeechToTextModelSettings):
     type: Literal[SpeechToTextModelType.SEGMENT_MERGING] = SpeechToTextModelType.SEGMENT_MERGING
-    model_settings: "SpeechToTextModelSettings"
+    speech_to_text_model_settings: "SpeechToTextModelSettings"
 
 
 SpeechToTextModelSettings = Annotated[
