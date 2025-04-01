@@ -101,7 +101,9 @@ class AudioFrameStream(BaseStream):
     sampling_rate: SamplingRate
 
     def __enter__(self) -> AudioChunkStream:
-        return AudioChunkStream(sampling_rate=self.sampling_rate, data=np.concatenate(list(self.chunks)))
+        return AudioChunkStream(
+            sampling_rate=self.sampling_rate, data=iter((np.concatenate(list(self.chunks)).view(AudioFrameChunk),))
+        )
 
     def __exit__(
         self, exc_type: Type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None

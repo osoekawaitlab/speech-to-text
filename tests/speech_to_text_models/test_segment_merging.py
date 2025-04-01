@@ -2,12 +2,18 @@ from collections.abc import Generator
 from typing import List
 from unittest.mock import MagicMock, call
 
+import pytest
 from pytest import fixture
 from pytest_mock import MockerFixture
 
-from ols2t.models import BaseStream, Segment
+from ols2t.models import BaseStream, FileStream, Segment
+from ols2t.settings import (
+    WhisperSpeechToTextModelLanguage,
+    WhisperSpeechToTextModelSize,
+)
 from ols2t.speech_to_text_models import segment_merging
 from ols2t.speech_to_text_models.base import BaseSpeechToTextModel
+from ols2t.speech_to_text_models.whisper import WhisperSpeechToTextModel
 from ols2t.types import AudioFrameChunk
 
 
@@ -169,3 +175,22 @@ def test_segment_merging_transcribe(
             ),
         ]
     )
+
+
+@pytest.mark.slow
+def test_segment_merging_speech_to_text_model_transcribe(hello_fixture: FileStream) -> None:
+    model = segment_merging.SegmentMergingSpeechToTextModel(
+        model=WhisperSpeechToTextModel(
+            path_or_model_size=WhisperSpeechToTextModelSize.SMALL, language=WhisperSpeechToTextModelLanguage.JA
+        )
+    )
+    expected = [Segment(start=0.0, end=1.04, text="こんにちは", probability=0.96)]
+    actual = model.transcribe(input_stream=hello_fixture)
+    cnt = 0
+    for a, e in zip(actual, expected):
+        assert abs(a.start - e.start) < 0.01
+        assert abs(a.end - e.end) < 0.01
+        assert abs(a.probability - e.probability) < 0.1
+        assert a.text == e.text
+        cnt += 1
+    assert cnt == 1
