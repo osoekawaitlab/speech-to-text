@@ -6,7 +6,7 @@ from pytest import fixture
 from pytest_mock import MockerFixture
 
 from ols2t.models import BaseStream, Segment
-from ols2t.speech_to_text_models import merged
+from ols2t.speech_to_text_models import segment_merging
 from ols2t.speech_to_text_models.base import BaseSpeechToTextModel
 from ols2t.types import AudioFrameChunk
 
@@ -113,16 +113,16 @@ def audio_frame_stream_values() -> Generator[List[MagicMock], None, None]:
     yield [MagicMock(spec=AudioFrameChunk) for _ in range(8)]
 
 
-def test_merged_transcribe(
+def test_segment_merging_transcribe(
     mocker: MockerFixture,
     speech_to_text_model_mock: MagicMock,
     dummy_input_stream: MagicMock,
     dummy_input_segments: List[MagicMock],
     audio_frame_stream_values: List[MagicMock],
 ) -> None:
-    AudioFrameStream = mocker.patch("ols2t.speech_to_text_models.merged.AudioFrameStream")
+    AudioFrameStream = mocker.patch("ols2t.speech_to_text_models.segment_merging.AudioFrameStream")
     AudioFrameStream.side_effect = audio_frame_stream_values
-    sut = merged.MargedSpeechToTextModel(model=speech_to_text_model_mock)
+    sut = segment_merging.SegmentMergingSpeechToTextModel(model=speech_to_text_model_mock)
     expected = [
         Segment(text="視", start=0.68, end=0.82, probability=0.938345730304718),
         Segment(text="聴", start=0.82, end=1.58, probability=0.9999861717224121),

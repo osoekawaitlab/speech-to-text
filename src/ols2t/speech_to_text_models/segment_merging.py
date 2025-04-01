@@ -6,8 +6,9 @@ from ..types import AudioFrameChunk
 from .base import BaseSpeechToTextModel
 
 
-class MargedSpeechToTextModel(BaseSpeechToTextModel):
+class SegmentMergingSpeechToTextModel(BaseSpeechToTextModel):
     def __init__(self, model: BaseSpeechToTextModel):
+        super(SegmentMergingSpeechToTextModel, self).__init__()
         self._model = model
         self._buffer_length = 3
         self._margin = 0.5
