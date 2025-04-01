@@ -79,12 +79,12 @@ class MargedSpeechToTextModel(BaseSpeechToTextModel):
                 include_current = self.compute_segment_weight(segments[i])
             else:
                 include_current = bests[last_index] + self.compute_segment_weight(segments[i])
-            eclude_current = bests[i - 1]
-            if include_current > eclude_current:
+            exclude_current = bests[i - 1]
+            if include_current > exclude_current:
                 bests.append(include_current)
                 selected_segments.append(True)
             else:
-                bests.append(eclude_current)
+                bests.append(exclude_current)
                 selected_segments.append(False)
         selected_indices = []
         i = len(segments) - 1
