@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Union
 
 from oltl.settings import BaseSettings as OltlBaseSettings
 from pydantic import DirectoryPath, Field
@@ -12,6 +12,7 @@ class BaseSettings(OltlBaseSettings):
 
 class SpeechToTextModelType(str, Enum):
     WHISPER = "WHISPER"
+    SEGMENT_MERGING = "SEGMENT_MERGING"
 
 
 class WhisperSpeechToTextModelSize(str, Enum):
@@ -56,7 +57,14 @@ class WhisperSpeechToTextModelSettings(BaseSpeechToTextModelSettings):
     language: WhisperSpeechToTextModelLanguage
 
 
-SpeechToTextModelSettings = Annotated[WhisperSpeechToTextModelSettings, Field(discriminator="type")]
+class SegmentMergingSpeechToTextModelSettings(BaseSpeechToTextModelSettings):
+    type: Literal[SpeechToTextModelType.SEGMENT_MERGING] = SpeechToTextModelType.SEGMENT_MERGING
+    model_settings: "SpeechToTextModelSettings"
+
+
+SpeechToTextModelSettings = Annotated[
+    Union[WhisperSpeechToTextModelSettings, SegmentMergingSpeechToTextModelSettings], Field(discriminator="type")
+]
 
 
 class SpeechToTextCoreSettings(BaseSettings):
