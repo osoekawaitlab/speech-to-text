@@ -5,6 +5,7 @@ from ols2t.settings import (
     BaseSpeechToTextModelSettings,
     SegmentMergingSpeechToTextModelSettings,
     SpeechToTextModelType,
+    WhisperSpeechToTextModelDevice,
     WhisperSpeechToTextModelLanguage,
     WhisperSpeechToTextModelSettings,
     WhisperSpeechToTextModelSize,
@@ -17,10 +18,13 @@ def test_factory_generates_whisper_speech_to_text_model(mocker: MockerFixture) -
     settings = WhisperSpeechToTextModelSettings(
         path_or_model_size=WhisperSpeechToTextModelSize.TINY,
         language=WhisperSpeechToTextModelLanguage.JA,
+        device=WhisperSpeechToTextModelDevice.CUDA,
     )
     create_speech_to_text_model(settings=settings)
     WhiepserSpeechToTextModel.assert_called_once_with(
-        path_or_model_size=WhisperSpeechToTextModelSize.TINY, language=WhisperSpeechToTextModelLanguage.JA
+        path_or_model_size=WhisperSpeechToTextModelSize.TINY,
+        language=WhisperSpeechToTextModelLanguage.JA,
+        device=WhisperSpeechToTextModelDevice.CUDA,
     )
 
 
@@ -44,5 +48,7 @@ def test_factory_generates_segment_merging_speech_to_text_model(mocker: MockerFi
     create_speech_to_text_model(settings=settings)
     SegmentMergingSpeechToTextModel.assert_called_once_with(model=WhisperSpeechToTextModel.return_value)
     WhisperSpeechToTextModel.assert_called_once_with(
-        path_or_model_size=WhisperSpeechToTextModelSize.TINY, language=WhisperSpeechToTextModelLanguage.JA
+        path_or_model_size=WhisperSpeechToTextModelSize.TINY,
+        language=WhisperSpeechToTextModelLanguage.JA,
+        device=WhisperSpeechToTextModelDevice.CPU,
     )

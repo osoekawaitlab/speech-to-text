@@ -55,6 +55,7 @@ class WhisperSpeechToTextModelSettings(BaseSpeechToTextModelSettings):
     type: Literal[SpeechToTextModelType.WHISPER] = SpeechToTextModelType.WHISPER
     path_or_model_size: WhisperSpeechToTextModelPathOrModelSize
     language: WhisperSpeechToTextModelLanguage
+    device: WhisperSpeechToTextModelDevice = WhisperSpeechToTextModelDevice.CPU
 
 
 class SegmentMergingSpeechToTextModelSettings(BaseSpeechToTextModelSettings):
