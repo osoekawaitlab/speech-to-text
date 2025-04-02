@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 
 from ..core import SpeechToTextCore
-from ..models import FileStream
+from ..models import FileStream, MicrophoneStream
 from .base import BaseInterface
 
 
@@ -21,7 +21,10 @@ class Cli(BaseInterface):
     def run(self) -> None:
         args = self.parser.parse_args()
         if args.subcommand == "transcribe":
-            stream = FileStream(path=args.audio_file)
+            if args.audio_file == "-":
+                stream = MicrophoneStream()
+            else:
+                stream = FileStream(path=args.audio_file)
             with open(args.output_file, "w", encoding="utf-8") as fout:
                 for segment in self.core.transcribe(input_stream=stream):
                     fout.write(segment.model_dump_json())
