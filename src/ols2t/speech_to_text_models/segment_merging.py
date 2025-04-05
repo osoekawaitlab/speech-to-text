@@ -67,6 +67,8 @@ class SegmentMergingSpeechToTextModel(BaseSpeechToTextModel):
         return (segment.end - segment.start) * segment.probability
 
     def merge_segments(self, segments: List[Segment]) -> List[Segment]:
+        if len(segments) == 0:
+            return []
         segments.sort(key=lambda x: x.end)
         bests = [self.compute_segment_weight(segments[0])]
         selected_segments = [True]

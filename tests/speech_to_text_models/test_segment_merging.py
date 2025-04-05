@@ -177,6 +177,42 @@ def test_segment_merging_transcribe(
     )
 
 
+@pytest.mark.parametrize(
+    ("segments", "expected"),
+    [
+        [
+            [
+                Segment(text="a", start=0.0, end=1.0, probability=0.9),
+                Segment(text="b", start=1.0, end=2.0, probability=0.9),
+                Segment(text="c", start=2.0, end=3.0, probability=0.9),
+            ],
+            [
+                Segment(text="a", start=0.0, end=1.0, probability=0.9),
+                Segment(text="b", start=1.0, end=2.0, probability=0.9),
+                Segment(text="c", start=2.0, end=3.0, probability=0.9),
+            ],
+        ],
+        [
+            [
+                Segment(text="a", start=0.0, end=1.0, probability=0.9),
+                Segment(text="b", start=1.0, end=2.0, probability=0.9),
+                Segment(text="c", start=2.0, end=3.0, probability=0.9),
+                Segment(text="d", start=0.0, end=2.0, probability=0.99),
+            ],
+            [
+                Segment(text="d", start=0.0, end=2.0, probability=0.99),
+                Segment(text="c", start=2.0, end=3.0, probability=0.9),
+            ],
+        ],
+        [[], []],
+    ],
+)
+def test_merge_segments(segments: List[Segment], expected: List[Segment]) -> None:
+    sut = segment_merging.SegmentMergingSpeechToTextModel(model=MagicMock(spec=BaseSpeechToTextModel))
+    actual = sut.merge_segments(segments)
+    assert actual == expected
+
+
 @pytest.mark.slow
 def test_segment_merging_speech_to_text_model_transcribe(hello_fixture: FileStream) -> None:
     model = segment_merging.SegmentMergingSpeechToTextModel(
