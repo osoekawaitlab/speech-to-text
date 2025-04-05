@@ -133,18 +133,18 @@ def test_segment_merging_transcribe(
         Segment(text="視", start=0.68, end=0.82, probability=0.938345730304718),
         Segment(text="聴", start=0.82, end=1.58, probability=0.9999861717224121),
         Segment(text="ありがとうございました", start=1.58, end=1.6, probability=0.9128336310386658),
-        Segment(text="こんにちは", start=0.8106875, end=2.5906875, probability=0.9733014702796936),
-        Segment(text="これは", start=3.041375, end=3.561375, probability=0.917963981628418),
-        Segment(text="テ", start=3.561375, end=3.821375, probability=0.95941561460495),
-        Segment(text="スト", start=3.82275, end=4.00275, probability=0.9999737739562988),
-        Segment(text="用", start=4.00275, end=4.22275, probability=0.9993946552276611),
-        Segment(text="の", start=4.22275, end=4.40275, probability=0.9991241097450256),
-        Segment(text="音", start=4.40275, end=4.52275, probability=0.9982801675796509),
-        Segment(text="声", start=4.52275, end=4.78275, probability=0.9995442032814026),
-        Segment(text="デ", start=4.78275, end=4.90275, probability=0.9992497563362122),
-        Segment(text="ー", start=4.90275, end=5.02275, probability=0.9999369382858276),
-        Segment(text="タ", start=5.02275, end=5.20275, probability=0.9999675750732422),
-        Segment(text="です。", start=5.20275, end=5.32275, probability=0.998569130897522),
+        Segment(text="こんにちは", start=1.621375, end=3.401375, probability=0.9733014702796936),
+        Segment(text="これは", start=3.8520624999999997, end=4.3720625, probability=0.917963981628418),
+        Segment(text="テ", start=4.3720625, end=4.6320625, probability=0.95941561460495),
+        Segment(text="スト", start=4.6334375, end=4.8134375, probability=0.9999737739562988),
+        Segment(text="用", start=4.8134375, end=5.0334375, probability=0.9993946552276611),
+        Segment(text="の", start=5.0334375, end=5.2134375, probability=0.9991241097450256),
+        Segment(text="音", start=5.2134375, end=5.3334375000000005, probability=0.9982801675796509),
+        Segment(text="声", start=5.3334375000000005, end=5.5934375, probability=0.9995442032814026),
+        Segment(text="デ", start=5.5934375, end=5.7134375, probability=0.9992497563362122),
+        Segment(text="ー", start=5.7134375, end=5.8334375000000005, probability=0.9999369382858276),
+        Segment(text="タ", start=5.8334375000000005, end=6.0134375, probability=0.9999675750732422),
+        Segment(text="です。", start=6.0134375, end=6.1334375, probability=0.998569130897522),
     ]
 
     actual = list(sut.transcribe(input_stream=dummy_input_stream))
@@ -155,24 +155,12 @@ def test_segment_merging_transcribe(
         [
             call(chunks=[dummy_input_segments[0]], sampling_rate=16000),
             call(chunks=[dummy_input_segments[0], dummy_input_segments[1]], sampling_rate=16000),
-            call(
-                chunks=[dummy_input_segments[0], dummy_input_segments[1], dummy_input_segments[2]], sampling_rate=16000
-            ),
-            call(
-                chunks=[dummy_input_segments[1], dummy_input_segments[2], dummy_input_segments[3]], sampling_rate=16000
-            ),
-            call(
-                chunks=[dummy_input_segments[2], dummy_input_segments[3], dummy_input_segments[4]], sampling_rate=16000
-            ),
-            call(
-                chunks=[dummy_input_segments[3], dummy_input_segments[4], dummy_input_segments[5]], sampling_rate=16000
-            ),
-            call(
-                chunks=[dummy_input_segments[4], dummy_input_segments[5], dummy_input_segments[6]], sampling_rate=16000
-            ),
-            call(
-                chunks=[dummy_input_segments[5], dummy_input_segments[6], dummy_input_segments[7]], sampling_rate=16000
-            ),
+            call(chunks=[dummy_input_segments[1], dummy_input_segments[2]], sampling_rate=16000),
+            call(chunks=[dummy_input_segments[2], dummy_input_segments[3]], sampling_rate=16000),
+            call(chunks=[dummy_input_segments[3], dummy_input_segments[4]], sampling_rate=16000),
+            call(chunks=[dummy_input_segments[4], dummy_input_segments[5]], sampling_rate=16000),
+            call(chunks=[dummy_input_segments[5], dummy_input_segments[6]], sampling_rate=16000),
+            call(chunks=[dummy_input_segments[6], dummy_input_segments[7]], sampling_rate=16000),
         ]
     )
 
@@ -220,7 +208,7 @@ def test_segment_merging_speech_to_text_model_transcribe(hello_fixture: FileStre
             path_or_model_size=WhisperSpeechToTextModelSize.SMALL, language=WhisperSpeechToTextModelLanguage.JA
         )
     )
-    expected = [Segment(start=0.0, end=1.04, text="こんにちは", probability=0.96)]
+    expected = [Segment(start=0.4, end=1.04, text="こんにちは", probability=0.96)]
     actual = model.transcribe(input_stream=hello_fixture)
     cnt = 0
     for a, e in zip(actual, expected):

@@ -53,8 +53,8 @@ def test_cli_transcribe_with_settings_option_json(fixture_dir: str) -> None:
         assert error_code.returncode == 0
         with open(os.path.join(tempdir, output_file_name), "r") as output_file:
             data = [json.loads(line) for line in output_file]
-        assert len(data) == 4
-        assert "".join(s["text"] for s in data) == "おにちわ"
+        assert len(data) == 5
+        assert "".join(s["text"] for s in data) == "ここに位置は"
 
 
 @pytest.mark.slow
@@ -75,5 +75,5 @@ def test_cli_transcribe_with_settings_option_yaml(fixture_dir: str) -> None:
         assert error_code.returncode == 0
         with open(os.path.join(tempdir, output_file_name), "r") as output_file:
             data = [json.loads(line) for line in output_file]
-        assert len(data) == 4
-        assert "".join(s["text"] for s in data) == "おにちわ"
+        assert len(data) == 5
+        assert "".join(s["text"] for s in data) == "ここに位置は"

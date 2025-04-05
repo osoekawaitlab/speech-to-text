@@ -15,7 +15,7 @@ def test_whisper_speech_to_text_model_transcribe(hello_fixture: FileStream) -> N
     model = WhisperSpeechToTextModel(
         path_or_model_size=WhisperSpeechToTextModelSize.SMALL, language=WhisperSpeechToTextModelLanguage.JA
     )
-    expected = [Segment(start=0.0, end=1.04, text="こんにちは", probability=0.96)]
+    expected = [Segment(start=0.4, end=1.04, text="こんにちは", probability=0.96)]
     actual = model.transcribe(input_stream=hello_fixture)
     cnt = 0
     for a, e in zip(actual, expected):

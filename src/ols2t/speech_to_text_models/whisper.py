@@ -47,9 +47,9 @@ class WhisperSpeechToTextModel(BaseSpeechToTextModel):
                     word_timestamps=True,
                     vad_filter=True,
                     vad_parameters={
-                        "threshold": 0.3,
-                        "min_speech_duration_ms": 100,
-                        "max_speech_duration_s": 10,
+                        "threshold": 0.2,
+                        "min_speech_duration_ms": 10,
+                        "max_speech_duration_s": 20,
                         "min_silence_duration_ms": 100,
                     },
                 )

@@ -4,9 +4,8 @@ from enum import Enum
 from multiprocessing import Event as MPEvent
 from multiprocessing import Process
 from multiprocessing import Queue as MPQueue
-from queue import Empty as QueueEmptyException
 from multiprocessing.synchronize import Event as EventClass
-from time import sleep
+from queue import Empty as QueueEmptyException
 from types import TracebackType
 from typing import Literal, Type, TypeAlias
 
