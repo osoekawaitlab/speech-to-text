@@ -14,6 +14,7 @@ def test_microphone_stream(
 ) -> None:
     PyAudio = mocker.patch("ols2t.models.PyAudio")
     PyAudio.return_value.open.return_value.read.side_effect = longtext_all_decoded_one_second_chunks
+    PyAudio.return_value.open.return_value.get_read_available.return_value = 16000
     sut = MicrophoneStream()
     with open(longtext_all_decoded_fixture_path, "rb") as f:
         x = np.load(f)
