@@ -28,6 +28,7 @@ class Cli(BaseInterface):
                 stream = FileStream(path=args.audio_file)
             with open(args.output_file, "w", encoding="utf-8") as fout:
                 for segment in self.core.transcribe(input_stream=stream):
+                    print(segment.text, end="", flush=True)
                     fout.write(segment.model_dump_json())
                     fout.write("\n")
         else:

@@ -1,5 +1,5 @@
 from io import BufferedReader
-from typing import List, NamedTuple, Optional, Tuple
+from typing import List, NamedTuple, Optional, Tuple, Dict
 
 import numpy as np
 from ctranslate2.models import Whisper
@@ -35,7 +35,12 @@ class Segment(NamedTuple):
 class WhisperModel:
     def __init__(self, model_size_or_path: str, device: str) -> None: ...
     def transcribe(
-        self, stream: BufferedReader | NDArray[np.float32], language: str, word_timestamps: bool
+        self,
+        stream: BufferedReader | NDArray[np.float32],
+        language: str,
+        word_timestamps: bool,
+        vad_filter: bool,
+        vad_parameters: Dict[str, float | int],
     ) -> Tuple[List[Segment], TranscriptionInfo]: ...
     @property
     def model(self) -> Whisper: ...

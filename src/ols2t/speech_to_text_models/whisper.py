@@ -41,7 +41,18 @@ class WhisperSpeechToTextModel(BaseSpeechToTextModel):
     def transcribe(self, input_stream: BaseStream) -> Generator[Segment, None, None]:
         with input_stream as s:
             for chunk in s:
-                segments, _ = self.model_cache.transcribe(chunk, language=self._language.value, word_timestamps=True)
+                segments, _ = self.model_cache.transcribe(
+                    chunk,
+                    language=self._language.value,
+                    word_timestamps=True,
+                    vad_filter=True,
+                    vad_parameters={
+                        "threshold": 0.3,
+                        "min_speech_duration_ms": 100,
+                        "max_speech_duration_s": 10,
+                        "min_silence_duration_ms": 100,
+                    },
+                )
                 for segment in segments:
                     for word in segment.words:
                         yield Segment(start=word.start, end=word.end, text=word.word, probability=word.probability)
