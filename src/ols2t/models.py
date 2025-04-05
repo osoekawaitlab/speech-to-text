@@ -4,6 +4,7 @@ from enum import Enum
 from multiprocessing import Event as MPEvent
 from multiprocessing import Process
 from multiprocessing import Queue as MPQueue
+from queue import Empty as QueueEmptyException
 from multiprocessing.synchronize import Event as EventClass
 from time import sleep
 from types import TracebackType
@@ -141,12 +142,8 @@ def recording_process(queue: "MPQueue[AudioFrameChunk | Exception | None]", stop
 
         while not stop_event.is_set():
             if stream.is_active():
-                available = stream.get_read_available()
-                if available > 0:
-                    data = stream.read(min(available, 4096), exception_on_overflow=False)
-                    queue.put(AudioFrameChunk(data), block=False)
-                else:
-                    sleep(0.01)
+                data = stream.read(16000, exception_on_overflow=False)
+                queue.put(AudioFrameChunk(data), block=False)
             else:
                 break
 
@@ -202,9 +199,9 @@ class MicrophoneStream(BaseStream):
                     raise chunk
 
                 yield chunk
-
-            except Exception as e:
-                print(f"Error in chunk iteration: {str(e)}")
+            except QueueEmptyException:
+                continue
+            except Exception:
                 break
 
     def __exit__(

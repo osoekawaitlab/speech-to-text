@@ -29,6 +29,7 @@ class WhisperSpeechToTextModelSize(str, Enum):
     LARGE_V1 = "large-v1"
     LARGE_V2 = "large-v2"
     LARGE_V3 = "large-v3"
+    LARGE_V3_TURBO = "large-v3-turbo"
     LARGE = "large"
     DISTIL_LARGE_V2 = "distil-large-v2"
     DISTIL_LARGE_V3 = "distil-large-v3"
