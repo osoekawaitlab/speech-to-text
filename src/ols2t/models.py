@@ -10,12 +10,13 @@ from types import TracebackType
 from typing import Literal, Type, TypeAlias
 
 import numpy as np
+from av import container as av_container
 from faster_whisper.audio import decode_audio
 from oltl import BaseModel
 from pyaudio import PyAudio, paFloat32
 from pydantic import FilePath
 
-from .types import AudioFrameChunk
+from .types import AudioFrameChunk, ContinuousBufferReader
 
 SamplingRate: TypeAlias = int
 
@@ -93,6 +94,7 @@ class StreamType(str, Enum):
     FILE = "FILE"
     MICROPHONE = "MICROPHONE"
     AUDIO_FRAME = "AUDIO_FRAME"
+    BYTES_CHUNK = "BYTES_CHUNK"
 
 
 class BaseStream(BaseModel, AbstractContextManager[AudioChunkStream]):
@@ -242,3 +244,77 @@ class Segment(BaseModel):
     start: float
     end: float
     probability: float
+
+
+def decoding_process(
+    queue: "MPQueue[bytes]", output_queue: "MPQueue[AudioFrameChunk | Exception | None]", stop_event: EventClass
+) -> None:
+    reader = ContinuousBufferReader(queue, stop_event)
+    container = av_container.open(reader, "r")
+    audio_stream = container.streams.audio[0]
+    for packet in container.decode(audio_stream):
+        output_queue.put(AudioFrameChunk(packet.to_ndarray()[0]))
+
+
+class BytesChunkStream(BaseStream):
+    type: Literal[StreamType.BYTES_CHUNK] = StreamType.BYTES_CHUNK
+
+    def __init__(
+        self, chunk_queue: "MPQueue[bytes]", stop_event: EventClass, type: StreamType = StreamType.BYTES_CHUNK
+    ) -> None:
+        super(BytesChunkStream, self).__init__(type=type)
+        self._max_queue_size = 256
+        self._process: Process | None = None
+        self._output_queue: "MPQueue[AudioFrameChunk | Exception | None]" | None = None
+        self._stop_event = stop_event
+        self._chunk_queue: "MPQueue[bytes]" = chunk_queue
+
+    def __enter__(self) -> AudioChunkStream:
+        self._output_queue = MPQueue(maxsize=self._max_queue_size)
+        self._process = Process(target=decoding_process, args=(self._chunk_queue, self._output_queue, self._stop_event))
+        self._process.daemon = True
+        self._process.start()
+
+        sampling_rate = 16000
+        return AudioChunkStream(sampling_rate, self._iter_chunks())
+
+    def _iter_chunks(self) -> Generator[AudioFrameChunk, None, None]:
+        if self._output_queue is None:
+            raise RuntimeError("Queue is not initialized. Did you call __enter__?")
+        if self._process is None:
+            raise RuntimeError("Process is not initialized. Did you call __enter__?")
+        if self._process.is_alive() is False:
+            raise RuntimeError("Process is not alive. Did you call __enter__?")
+        while self._process.is_alive():
+            try:
+                chunk = self._output_queue.get(timeout=1.0)
+                if chunk is None:
+                    break
+
+                if isinstance(chunk, Exception):
+                    raise chunk
+
+                yield chunk
+            except QueueEmptyException:
+                continue
+            except Exception:
+                break
+
+    def __exit__(
+        self, exc_type: Type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None
+    ) -> bool | None:
+
+        if self._process and self._process.is_alive():
+            self._process.join(timeout=0.1)
+            if self._process.is_alive():
+                self._process.terminate()
+
+        if self._output_queue:
+            self._output_queue.close()
+            self._output_queue.join_thread()
+
+        if self._process:
+            self._process.join()
+            self._process.close()
+
+        return super().__exit__(exc_type, exc_value, traceback)

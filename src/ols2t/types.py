@@ -1,4 +1,9 @@
+import time
 from base64 import b64decode
+from io import BytesIO
+from multiprocessing import Queue as MPQueue
+from multiprocessing.synchronize import Event as EventClass
+from queue import Empty as QueueEmptyException
 from typing import Any, List, TypeAlias, cast
 
 import numpy as np
@@ -65,3 +70,53 @@ class AudioFrameChunk(NDArray[AudioSample]):
 
     def serialize(self) -> List[float]:
         return cast(List[float], self.tolist())
+
+
+class ContinuousBufferReader(BytesIO):
+    """
+    >>> from multiprocessing import Process
+    >>> from multiprocessing import Event as MPEvent
+    >>> queue = MPQueue(maxsize=256)
+    >>> stop_event = MPEvent()
+    >>> reader = ContinuousBufferReader(queue, stop_event)
+    >>> queue.put(b"1234567890")
+    >>> reader.read(10)
+    b'1234567890'
+    >>> def adding_chunks(queue) -> None:
+    ...     for i in range(3):
+    ...         time.sleep(0.1)
+    ...         queue.put(b"1234567890")
+    >>> p = Process(target=adding_chunks, args=(queue,))
+    >>> p.start()
+    >>> reader.read(13)
+    b'1234567890123'
+    >>> p.join()
+    >>> stop_event.set()
+    >>> reader.read(30)
+    b'45678901234567890'
+    """
+
+    def __init__(self, queue: "MPQueue[bytes]", stop_event: EventClass) -> None:
+        super(ContinuousBufferReader, self).__init__(b"")
+        self._queue: "MPQueue[bytes]" = queue
+        self._stop_event: EventClass = stop_event
+
+    def read(self, size: int | None = -1) -> bytes:
+        if size is None or size < 0:
+            raise ValueError("size must be positive")
+        while self.tell() < size:
+            try:
+                chunk = self._queue.get(timeout=1.0)
+                if chunk is None:
+                    time.sleep(0.01)
+                self.write(chunk)
+            except QueueEmptyException:
+                if self._stop_event.is_set():
+                    break
+                time.sleep(0.01)
+        current_buffer = self.getvalue()
+        return_value: bytes = current_buffer[:size]
+        self.seek(0)
+        self.truncate()
+        self.write(current_buffer[size:])
+        return return_value
