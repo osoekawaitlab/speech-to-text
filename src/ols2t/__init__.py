@@ -1,5 +1,5 @@
 from .core import SpeechToTextCore
-from .models import FileStream
+from .models import BytesChunkStream, FileStream, MicrophoneStream
 from .settings import (
     SpeechToTextCoreSettings,
     SpeechToTextModelSettings,
@@ -18,4 +18,6 @@ __all__ = [
     "WhisperSpeechToTextModelSize",
     "SpeechToTextCore",
     "FileStream",
+    "MicrophoneStream",
+    "BytesChunkStream",
 ]
