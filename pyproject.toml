@@ -44,6 +44,11 @@ ols2t = ["py.typed"]
 ols2t = "ols2t.main:main"
 
 [project.optional-dependencies]
+http=[
+    "fastapi",
+    "uvicorn[standard]",
+    "python-multipart",
+]
 dev=[
     "black",
     "flake8",
@@ -62,6 +67,8 @@ dev=[
     "httpx",
     "pytest-random-order",
     "uvicorn",
+    "fastapi",
+    "python-multipart",
 ]
 prod=[
 ]

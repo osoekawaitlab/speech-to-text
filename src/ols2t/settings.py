@@ -75,6 +75,7 @@ class SpeechToTextCoreSettings(BaseSettings):
 
 class InterfaceType(str, Enum):
     CLI = "CLI"
+    HTTP_API = "HTTP_API"
 
 
 class BaseInterfaceSettings(BaseSettings):
@@ -85,7 +86,13 @@ class CliSettings(BaseInterfaceSettings):
     type: Literal[InterfaceType.CLI] = InterfaceType.CLI
 
 
-InterfaceSettings = Annotated[CliSettings, Field(discriminator="type")]
+class HttpApiSettings(BaseInterfaceSettings):
+    type: Literal[InterfaceType.HTTP_API] = InterfaceType.HTTP_API
+    host: str = "0.0.0.0"
+    port: int = 8000
+
+
+InterfaceSettings = Annotated[Union[CliSettings, HttpApiSettings], Field(discriminator="type")]
 
 
 class SpeechToTextAppSettings(BaseSettings):
